@@ -18,7 +18,7 @@ class CreateBidsTable extends Migration
             $table->float('amount');
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('item_id')->unsigned();
-            $table->boolean('is_auto_bid');
+            $table->boolean('is_auto_bid')->default(false);
             $table->timestamps();
         });
         Schema::table('bids', function($table) {
