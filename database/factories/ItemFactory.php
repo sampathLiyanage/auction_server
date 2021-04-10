@@ -2,9 +2,8 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\User;
+use App\Item;
 use Faker\Generator as Faker;
-use Illuminate\Support\Str;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,10 +16,11 @@ use Illuminate\Support\Str;
 |
 */
 
-$factory->define(User::class, function (Faker $faker) {
+$factory->define(Item::class, function (Faker $faker) {
     return [
-        'name' => $faker->name,
-        'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
-        'api_token' => Str::random(60),
+        'name' => $faker->sentence(),
+        'description' => $faker->text(),
+        'price' => $faker->randomFloat(2, 1, 100000),
+        'auction_end_time' => $faker->dateTimeBetween('now', '+ 1 year')->format('Y-m-d h:m:s')
     ];
 });

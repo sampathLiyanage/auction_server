@@ -21,5 +21,5 @@ Route::get('bids', 'BidController@search');
 Route::middleware([\App\Http\Middleware\ValidateAuthToken::class])->group(function () {
     Route::post('bids', 'BidController@store');
     Route::get('configurations/{userId}', 'ConfigurationController@show');
-    Route::put('configurations/{userId}', 'ConfigurationController@update');
+    Route::patch('configurations/{userId}', 'ConfigurationController@update');
 });

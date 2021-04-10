@@ -56,6 +56,18 @@ class Handler extends ExceptionHandler
             return response()->json([
                 'error' => 'Resource not found'
             ], 404);
+        } else if ($exception instanceof BadRequestException) {
+            return response()->json([
+                'error' => $exception->getMessage()
+            ], 400);
+        } else if ($exception instanceof UnauthorizedException) {
+            return response()->json([
+                'error' => $exception->getMessage()
+            ], 401);
+        } else if ($exception instanceof \Exception) {
+            return response()->json([
+                'error' => 'Internal Server Error'
+            ], 500);
         }
 
         return parent::render($request, $exception);

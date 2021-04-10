@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\BadRequestException;
+use App\Exceptions\UnauthorizedException;
 use App\User;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -10,6 +13,13 @@ class AuthController extends Controller
 {
     public function login(Request $request) {
         $credentials = $request->only('username', 'password');
+        $validator = Validator::make($credentials,[
+            'username' => 'required',
+            'password' => 'required',
+        ]);
+        if ($validator->fails()) {
+            throw new BadRequestException($validator->errors()->toJson());
+        }
         $user = User::where([
             ['name', '=', $credentials['username']],
             ['password', '=', md5($credentials['password'])]
@@ -21,13 +31,17 @@ class AuthController extends Controller
                 'data' => $user->toArray(),
             ]);
         }
-        return response()->json([
-            'error' => 'Login Credentials Mismatch'
-        ], 401);
+        throw new UnauthorizedException('Login Credentials Mismatch');
     }
 
     public function logout(Request $request) {
-        $token = request('token', false);
+        $token = request('token');
+        $validator = Validator::make(['token'=>$token],[
+            'token' => 'required'
+        ]);
+        if ($validator->fails()) {
+            throw new BadRequestException($validator->errors()->toJson());
+        }
         if ($token) {
             $user = User::where('api_token', '=', $token)->first();
             if (!is_null($user)) {
@@ -38,8 +52,6 @@ class AuthController extends Controller
                 ], 200);
             }
         }
-        return response()->json([
-            'error' => 'Invalid token'
-        ], 400);
+        throw new BadRequestException('Invalid Token');
     }
 }

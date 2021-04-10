@@ -2,8 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Exceptions\UnauthorizedException;
 use App\User;
 use Closure;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 
 class ValidateAuthToken
@@ -18,9 +20,7 @@ class ValidateAuthToken
     public function handle($request, Closure $next)
     {
         if (!$this->validateAuthToken($request)) {
-            return response()->json([
-                'error' => 'Invalid Access Token'
-            ], 403);
+            throw new UnauthorizedException('Invalid API Token');
         }
         return $next($request);
     }
@@ -29,8 +29,11 @@ class ValidateAuthToken
         $header = $request->header('Authorization', '');
         if (Str::startsWith($header, 'Bearer ')) {
             $token = explode('Bearer ', $header)[1];
-            $userCount = User::where('api_token', '=', $token)->count();
-            return $userCount > 0;
+            $user = User::where('api_token', '=', $token)->first();
+            if (!is_null($user)) {
+                Session::put('loggedInUserId', $user->id);
+                return true;
+            }
         }
         return false;
     }
