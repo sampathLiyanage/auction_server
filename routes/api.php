@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +13,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::post('login', 'AuthController@login');
+Route::post('logout', 'AuthController@logout');
+Route::get('items', 'ItemController@index');
+Route::get('items/{id}', 'ItemController@show');
+Route::get('bids', 'BidController@search');
+Route::post('bids', 'BidController@store');
+Route::get('configurations/{userId}', 'ConfigurationController@show');
+Route::put('configurations/{userId}', 'ConfigurationController@update');
