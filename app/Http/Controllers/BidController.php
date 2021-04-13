@@ -19,9 +19,11 @@ class BidController extends Controller
         if ($validator->fails()) {
             throw new BadRequestException($validator->errors()->toJson());
         }
-        return Bid::where('item_id', '=', $itemId)
+        $data = Bid::with('user:id,name')
+            ->where('item_id', '=', $itemId)
             ->orderBy('created_at', 'DESC')
             ->get();
+        return ['data'=>$data];
     }
 
     public function store(Request $request) {
