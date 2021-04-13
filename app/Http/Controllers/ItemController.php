@@ -38,13 +38,14 @@ class ItemController extends Controller
         if ($sortField && $sortOrder) {
             $query->orderBy($sortField, $sortOrder);
         }
+        $total = $query->count();
         if ($offset !== '') {
             $query->offset($offset);
         }
         if ($limit !== '') {
             $query->limit($limit);
         }
-        return $query->get();
+        return ['data'=>$query->get(), 'meta'=>['total'=>$total]];
     }
 
     public function show($id) {
@@ -54,6 +55,6 @@ class ItemController extends Controller
         if ($validator->fails()) {
             throw new BadRequestException($validator->errors()->toJson());
         }
-        return Item::find($id);
+        return ['data'=>Item::find($id)];
     }
 }
