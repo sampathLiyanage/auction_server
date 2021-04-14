@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\BadRequestException;
 use App\Exceptions\UnauthorizedException;
+use App\Item;
 use Illuminate\Http\Request;
 use App\Bid;
 use Illuminate\Support\Facades\Session;
@@ -39,18 +40,32 @@ class BidController extends Controller
         } else if ($params['user_id'] != Session::get('loggedInUserId')) {
             throw new UnauthorizedException();
         }
-        $bidCount = Bid::where('item_id', '=', $params['item_id'])
+        $this->validateIfBiddingOnGoing($params['item_id']);
+        $this->validateBiddingAmount($params['item_id'], $params['amount']);
+        $bid = Bid::create($params);
+        return response()->json($bid, 201);
+    }
+
+    protected function validateIfBiddingOnGoing($itemId) {
+        $item = Item::find($itemId);
+        if (is_null($item->auction_end_time)) {
+            throw new BadRequestException('Bidding is not started');
+        } else if ($item->auction_end_time < date("Y-m-d H:i:s", time())) {
+            throw new BadRequestException('Bidding is closed');
+        }
+    }
+
+    protected function validateBiddingAmount($itemId, $biddingAmount) {
+        $bidCount = Bid::where('item_id', '=', $itemId)
             ->orderBy('amount', 'DESC')
             ->count();
         if ($bidCount > 0) {
-            $latestBid = Bid::where('item_id', '=', $params['item_id'])
+            $latestBid = Bid::where('item_id', '=', $itemId)
                 ->orderBy('amount', 'DESC')
                 ->first();
-            if ($params['amount'] <= $latestBid->amount) {
+            if ($biddingAmount <= $latestBid->amount) {
                 throw new BadRequestException('Bid amount should be larger than previous bids');
             }
         }
-        $bid = Bid::create($params);
-        return response()->json($bid, 201);
     }
 }

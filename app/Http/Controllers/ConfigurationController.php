@@ -24,7 +24,7 @@ class ConfigurationController extends Controller
         $this->validateUserId($userId);
         $configValue = $request->only('max_bid_amount');
         $validator = Validator::make($configValue,[
-            'max_bid_amount' => 'required|numeric|min:0'
+            'max_bid_amount' => 'nullable|numeric|min:0'
         ]);
         if ($validator->fails()) {
             throw new BadRequestException($validator->errors()->toJson());
