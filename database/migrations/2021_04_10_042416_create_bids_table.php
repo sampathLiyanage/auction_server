@@ -15,7 +15,7 @@ class CreateBidsTable extends Migration
     {
         Schema::create('bids', function (Blueprint $table) {
             $table->increments('id');
-            $table->float('amount');
+            $table->float('amount')->nullable();
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('item_id')->unsigned();
             $table->boolean('is_auto_bid')->default(false);

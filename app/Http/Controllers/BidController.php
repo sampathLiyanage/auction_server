@@ -30,7 +30,7 @@ class BidController extends Controller
     public function store(Request $request) {
         $params = $request->only('amount', 'user_id', 'item_id', 'is_auto_bid');
         $validator = Validator::make($params,[
-            'amount' => 'required|integer|min:0',
+            'amount' => 'nullable|integer|min:0',
             'user_id' => 'required|integer|min:1',
             'item_id' => 'required|integer|min:1',
             'is_auto_bid' => 'boolean',
@@ -41,7 +41,9 @@ class BidController extends Controller
             throw new UnauthorizedException();
         }
         $this->validateIfBiddingOnGoing($params['item_id']);
-        $this->validateBiddingAmount($params['item_id'], $params['amount']);
+        if (!is_null($params['amount'])) {
+            $this->validateBiddingAmount($params['item_id'], $params['amount']);
+        }
         $bid = Bid::create($params);
         return response()->json($bid, 201);
     }
