@@ -39,11 +39,16 @@ class BidController extends Controller
         } else if ($params['user_id'] != Session::get('loggedInUserId')) {
             throw new UnauthorizedException();
         }
-        $latestBid = Bid::where('item_id', '=', $params['item_id'])
+        $bidCount = Bid::where('item_id', '=', $params['item_id'])
             ->orderBy('amount', 'DESC')
-            ->first();
-        if ($params['amount'] <= $latestBid->amount) {
-            throw new BadRequestException('Bid amount should be larger than previous bids');
+            ->count();
+        if ($bidCount > 0) {
+            $latestBid = Bid::where('item_id', '=', $params['item_id'])
+                ->orderBy('amount', 'DESC')
+                ->first();
+            if ($params['amount'] <= $latestBid->amount) {
+                throw new BadRequestException('Bid amount should be larger than previous bids');
+            }
         }
         $bid = Bid::create($params);
         return response()->json($bid, 201);
