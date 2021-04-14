@@ -29,7 +29,7 @@ class BidController extends Controller
     public function store(Request $request) {
         $params = $request->only('amount', 'user_id', 'item_id', 'is_auto_bid');
         $validator = Validator::make($params,[
-            'amount' => 'required|numeric|min:0',
+            'amount' => 'required|integer|min:0',
             'user_id' => 'required|integer|min:1',
             'item_id' => 'required|integer|min:1',
             'is_auto_bid' => 'boolean',
@@ -38,6 +38,12 @@ class BidController extends Controller
             throw new BadRequestException($validator->errors()->toJson());
         } else if ($params['user_id'] != Session::get('loggedInUserId')) {
             throw new UnauthorizedException();
+        }
+        $latestBid = Bid::where('item_id', '=', $params['item_id'])
+            ->orderBy('amount', 'DESC')
+            ->first();
+        if ($params['amount'] <= $latestBid->amount) {
+            throw new BadRequestException('Bid amount should be larger than previous bids');
         }
         $bid = Bid::create($params);
         return response()->json($bid, 201);
