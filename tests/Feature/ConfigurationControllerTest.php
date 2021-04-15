@@ -14,7 +14,7 @@ class ConfigurationControllerTest extends TestCase
         $response = $this->json('GET', 'api/configurations/'.$user1->id, [], ['Authorization'=>'Bearer '.$token])
             ->assertStatus(200);
         $responseData = json_decode($response->getContent(),true);
-        $this->assertEquals('{"max_bid_amount": "13923.35"}', $responseData['configuration']);
+        $this->assertEquals(13923.35, $responseData['data']['max_bid_amount']);
     }
 
     public function testShowConfigurationWithUserOtherThanLoggedInUser() {
@@ -50,7 +50,7 @@ class ConfigurationControllerTest extends TestCase
         $response = $this->json('PATCH', 'api/configurations/'.$user->id, ['max_bid_amount'=>"23532.23"], ['Authorization'=>'Bearer '.$token])
             ->assertStatus(200);
         $responseData = json_decode($response->getContent(),true);
-        $this->assertEquals('{"max_bid_amount":"23532.23"}', $responseData['configuration']);
+        $this->assertEquals('23532.23', $responseData['data']['max_bid_amount']);
     }
 
     public function testSaveExistingConfiguration() {
@@ -77,7 +77,7 @@ class ConfigurationControllerTest extends TestCase
             [['max_bid_amount'=>"-12.7"], null, 400],
             [['max_bid_amount'=>"0"], null, 200],
             [['max_bid_amount'=>"ssdf"], null, 400],
-            [['invalid_key'=>"ssdf"], null, 400],
+            [['invalid_key'=>"ssdf"], null, 500],
             [['max_bid_amount'=>"300"], "0", 400],
             [['max_bid_amount'=>"300"], "-1", 400],
             [['max_bid_amount'=>"300"], "sdfdd", 400],
@@ -91,7 +91,8 @@ class ConfigurationControllerTest extends TestCase
         ]);
         $user2 = factory(User::class)->create();
         factory(Configuration::class)->create([
-            'configuration' => '{"max_bid_amount": "13923.35"}'
+            'user_id' => 1,
+            'max_bid_amount' => 13923.35
         ]);
         return [$user1, $user2, $token];
     }

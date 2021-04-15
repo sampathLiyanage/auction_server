@@ -12,7 +12,7 @@ class ItemControllerTest extends TestCase
         $items = $this->populateItems(5,1);
         $response1 = $this->json('GET', 'api/items/'.$items[3]->id)
             ->assertStatus(200);
-        $responseData1 = json_decode($response1->getContent(),true);
+        $responseData1 = json_decode($response1->getContent(),true)['data'];
         $this->assertEquals($items[3]->id, $responseData1['id']);
         $this->assertEquals($items[3]->name, $responseData1['name']);
         $this->assertEquals($items[3]->description, $responseData1['description']);
@@ -21,7 +21,7 @@ class ItemControllerTest extends TestCase
         $this->assertEquals($items[3]->owner_id, $responseData1['owner_id']);
         $response2 = $this->json('GET', 'api/items/'.$items[5]->id)
             ->assertStatus(200);
-        $responseData2 = json_decode($response2->getContent(),true);
+        $responseData2 = json_decode($response2->getContent(),true)['data'];
         $this->assertEquals($items[5]->id, $responseData2['id']);
         $this->assertEquals($items[5]->name, $responseData2['name']);
         $this->assertEquals($items[5]->description, $responseData2['description']);
@@ -66,7 +66,7 @@ class ItemControllerTest extends TestCase
         $response = $this->json('GET', 'api/items',
             ['filter'=>$search])
             ->assertStatus(200);
-        $responseData = json_decode($response->getContent(),true);
+        $responseData = json_decode($response->getContent(),true)['data'];
         $itemsMatchingNameOrDescription = [];
         foreach ($items as $item) {
             if (strpos($search, strtolower($item->name)) !== false
@@ -93,7 +93,7 @@ class ItemControllerTest extends TestCase
         $response = $this->json('GET', 'api/items',
             ['offset'=>$offset, 'limit'=>$limit])
             ->assertStatus(200);
-        $responseData = json_decode($response->getContent(),true);
+        $responseData = json_decode($response->getContent(),true)['data'];
         $this->assertCount($count, $responseData);
         if ($count > 0) {
             $this->assertEquals($responseData[0]['id'], $firstId);
@@ -137,7 +137,7 @@ class ItemControllerTest extends TestCase
         $response = $this->json('GET', 'api/items',
             ['sortField'=>$sortField, 'sortOrder'=>$sortOrder])
             ->assertStatus(200);
-        $responseData = json_decode($response->getContent(),true);
+        $responseData = json_decode($response->getContent(),true)['data'];
         for($i=0; $i<count($idOrder); $i++) {
             $this->assertEquals($idOrder[$i], $responseData[$i]['id']);
         }

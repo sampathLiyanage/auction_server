@@ -29,7 +29,7 @@ class AuthController extends Controller
             $user->save();
             return response()->json([
                 'data' => $user->toArray(),
-            ]);
+            ], 200);
         }
         throw new UnauthorizedException('Login Credentials Mismatch');
     }

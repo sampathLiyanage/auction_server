@@ -3,10 +3,13 @@
 namespace Tests\Feature;
 
 use App\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function testLoginWithoutCredentials() {
         $this->json('POST', 'api/login')
             ->assertStatus(400)
@@ -16,7 +19,7 @@ class AuthControllerTest extends TestCase
     }
 
     public function testLoginWithInvalidCredentials() {
-        $this->json('POST', 'api/login', ["username"=>"user1", "password"=>"user1"])
+        $this->json('POST', 'api/login', ["username"=>"usery", "password"=>"usery"])
             ->assertStatus(401)
             ->assertJson([
                 'error' => 'Login Credentials Mismatch'
@@ -25,12 +28,12 @@ class AuthControllerTest extends TestCase
 
     public function testLoginWithValidCredentials() {
         factory(User::class)->create([
-            'name' => 'user1',
-            'password' => md5('user1'),
+            'name' => 'userx',
+            'password' => md5('userx'),
         ]);
-        $response = $this->json('POST', 'api/login', ["username"=>"user1", "password"=>"user1"])
+        $response = $this->json('POST', 'api/login', ["username"=>"userx", "password"=>"userx"])
             ->assertStatus(200)
-            ->assertJsonPath("data.name","user1");
+            ->assertJsonPath("data.name","userx");
         $responseArray = json_decode($response->getContent(), true);
         $this->assertEquals(60, strlen($responseArray['data']['api_token']));
     }
@@ -45,8 +48,8 @@ class AuthControllerTest extends TestCase
 
     public function testLogoutWithToken() {
         factory(User::class)->create([
-            'name' => 'user1',
-            'password' => md5('user1'),
+            'name' => 'userx',
+            'password' => md5('userx'),
             'api_token' => 'YHkEM0R3uRBcE5ieVAC0MCmXUDfUpbnwkHH4Tc3X1wZtXI8KMqCuO3yno7Rp'
         ]);
         $this->json('POST', 'api/logout', ["token"=>"invalidToken"])

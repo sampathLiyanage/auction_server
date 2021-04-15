@@ -44,7 +44,7 @@ class ItemController extends Controller
         if ($limit !== '') {
             $query->limit($limit);
         }
-        return ['data'=>$query->get(), 'meta'=>['total'=>$total]];
+        return response()->json(['data'=>$query->get(), 'meta'=>['total'=>$total]], 200);
     }
 
     public function show($id) {
@@ -54,6 +54,6 @@ class ItemController extends Controller
         if ($validator->fails()) {
             throw new BadRequestException($validator->errors()->toJson());
         }
-        return ['data'=>Item::find($id)];
+        return response()->json(['data'=>Item::find($id)], 200);
     }
 }

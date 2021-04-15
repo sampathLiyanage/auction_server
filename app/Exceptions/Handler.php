@@ -66,7 +66,7 @@ class Handler extends ExceptionHandler
             ], 401);
         } else if ($exception instanceof \Exception) {
             return response()->json([
-                'error' => $exception->getMessage()
+                'error' => 'Internal Server Error'
             ], 500);
         }
 

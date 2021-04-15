@@ -25,7 +25,10 @@ class AutoBidStatusController extends Controller
         } else if ($userId != Session::get('loggedInUserId')) {
             throw new UnauthorizedException();
         }
-        return ['data'=> AutoBidStatus::firstOrCreate(['user_id'=>$userId, 'item_id'=>$itemId], [])];
+        $data = AutoBidStatus::firstOrCreate(['user_id'=>$userId, 'item_id'=>$itemId], []);
+        return response()->json([
+            'data' => $data,
+        ], 200);
     }
 
     public function update(Request $request) {
@@ -45,6 +48,8 @@ class AutoBidStatusController extends Controller
         if ($params['auto_bid_enabled']) {
             (new AutoBidBot(new AutoBidDefaultStrategy()))->autoBid($params['item_id']);
         }
-        return ['data'=>response()->json($autoBidStatus, 200)];
+        return response()->json([
+            'data' => $autoBidStatus,
+        ], 200);
     }
 }

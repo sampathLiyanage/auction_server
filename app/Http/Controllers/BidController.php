@@ -27,7 +27,9 @@ class BidController extends Controller
             ->where('item_id', '=', $itemId)
             ->orderBy('id', 'DESC')
             ->get();
-        return ['data'=>$data];
+        return response()->json([
+            'data' => $data,
+        ], 200);
     }
 
     public function store(Request $request) {
@@ -47,7 +49,9 @@ class BidController extends Controller
         $this->validateBiddingAmountAndLatestBid($params['item_id'], $params['user_id'], $params['amount']);
         $bid = Bid::create($params);
         (new AutoBidBot(new AutoBidDefaultStrategy()))->autoBid($params['item_id']);
-        return ['data'=>response()->json($bid, 201)];
+        return response()->json([
+            'data' => $bid,
+        ], 201);
     }
 
     protected function validateIfBiddingOnGoing($itemId) {

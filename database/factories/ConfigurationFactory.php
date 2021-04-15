@@ -19,6 +19,6 @@ use Faker\Generator as Faker;
 $factory->define(Configuration::class, function (Faker $faker) {
     return [
         'user_id' => 1,
-        'configuration' => '{"max_bid_amount":"'.$faker->randomFloat(2, 1, 100000).'"}'
+        'max_bid_amount' => $faker->randomFloat(2, 1, 100000)
     ];
 });

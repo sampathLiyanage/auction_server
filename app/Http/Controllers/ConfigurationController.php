@@ -18,7 +18,8 @@ class ConfigurationController extends Controller
         if ($userId != Session::get('loggedInUserId')) {
             throw new UnauthorizedException();
         }
-        return ['data'=>Configuration::firstOrCreate(['user_id'=>$userId], ['max_bid_amount'=>null])];
+        $data = Configuration::firstOrCreate(['user_id'=>$userId], ['max_bid_amount'=>null]);
+        return response()->json(['data'=>$data], 200);
     }
 
     public function update(Request $request, $userId) {
@@ -37,7 +38,7 @@ class ConfigurationController extends Controller
         if ($params['max_bid_amount'] > 0) {
             (new AutoBidBot(new AutoBidDefaultStrategy()))->autoBid(null, null);
         }
-        return ['data'=>response()->json($configuration, 200)];
+        return response()->json(['data'=>$configuration], 200);
     }
 
     protected function validateUserId($userId) {

@@ -27,19 +27,19 @@ class BidControllerTest extends TestCase
         $user2 = factory(User::class)->create();
         $item = factory(Item::class)->create();
         factory(Bid::class)->create([
-            'user_id' => $user1->id,
-            'item_id' => $item->id,
-            'amount' => '124.23'
-        ]);
-        factory(Bid::class)->create([
             'user_id' => $user2->id,
             'item_id' => $item->id,
             'is_auto_bid' => 1,
             'amount' => '3235.12'
         ]);
+        factory(Bid::class)->create([
+            'user_id' => $user1->id,
+            'item_id' => $item->id,
+            'amount' => '124.23'
+        ]);
         $response = $this->json('GET', 'api/bids?itemId='.$item->id)
             ->assertStatus(200);
-        $responseData = json_decode($response->getContent(),true);
+        $responseData = json_decode($response->getContent(),true)['data'];
         $this->assertCount(2, $responseData);
         $this->assertEquals($user1->id, $responseData[0]['user_id']);
         $this->assertEquals($user2->id, $responseData[1]['user_id']);
@@ -84,20 +84,20 @@ class BidControllerTest extends TestCase
     public function testStoreWithValidInput() {
         list($user1, $user2, $item, $token) = $this->populateDataForTestStore();
         $response = $this->json('POST', 'api/bids',
-            ['amount'=>'125.25', 'user_id'=>$user1->id, 'item_id'=>$item->id],
+            ['amount'=>'4256', 'user_id'=>$user1->id, 'item_id'=>$item->id],
             ['Authorization'=>'Bearer '.$token])
             ->assertStatus(201);
-        $responseData = json_decode($response->getContent(),true);
+        $responseData = json_decode($response->getContent(),true)['data'];
         $this->assertEquals($user1->id, $responseData['user_id']);
         $this->assertEquals($item->id, $responseData['item_id']);
         $this->assertTrue(!isset($responseData['is_auto_bid']));
-        $this->assertEquals('125.25', $responseData['amount']);
+        $this->assertEquals('4256', $responseData['amount']);
     }
 
     public function testStoreWithUserOtherThanLoggedInUser() {
         list($user1, $user2, $item, $token) = $this->populateDataForTestStore();
         $this->json('POST', 'api/bids',
-            ['amount'=>'125.25', 'user_id'=>$user2->id, 'item_id'=>$item->id],
+            ['amount'=>'4256', 'user_id'=>$user2->id, 'item_id'=>$item->id],
             ['Authorization'=>'Bearer '.$token])
             ->assertStatus(401)
         ->assertJson(['error'=>'Unauthorized']);
@@ -117,7 +117,7 @@ class BidControllerTest extends TestCase
         $userId = ($userId === false)?$user1->id:$userId;
         $itemId = ($itemId === false)?$item->id:$itemId;
         $this->json('POST', 'api/bids',
-            ['amount'=>$amount, 'user_id'=>$userId, 'item_id'=>$itemId, 'is_auto_bid'=>$isAutoBidding],
+            ['amount'=>$amount, 'user_id'=>$userId, 'item_id'=>$itemId],
             ['Authorization'=>'Bearer '.$token])
             ->assertStatus($statusCode);
     }
@@ -125,17 +125,17 @@ class BidControllerTest extends TestCase
     public function storeWithInvalidParametersDataProvider() {
         return [
             [-1, false, false, 0, 400],
-            [0, false, false, 0, 201],
-            [123, false, false, 0, 201],
+            [0, false, false, 0, 400],
+            [4123, false, false, 0, 201],
             ['asdf', false, false, 0, 400],
-            [123, -1, false, 0, 400],
-            [123, 0, false, 0, 400],
-            [123, 'asdfd', false, 0, 400],
-            [123, false, -1, 0, 400],
-            [123, false, 0, 0, 400],
-            [123, false, 'asdfd', 0, 400],
-            [123, false, false, 1, 201],
-            [123, false, false, 'sdfd', 400]
+            [4123, -1, false, 0, 400],
+            [4123, 0, false, 0, 400],
+            [4123, 'asdfd', false, 0, 400],
+            [4123, false, -1, 0, 400],
+            [4123, false, 0, 0, 400],
+            [4123, false, 'asdfd', 0, 400],
+            [4123, false, false, 1, 201],
+            [123, false, false, 1, 400]
         ];
     }
 
@@ -145,6 +145,7 @@ class BidControllerTest extends TestCase
             'api_token'=>$token
         ]);
         $user2 = factory(User::class)->create();
+        $user3 = factory(User::class)->create();
         $item = factory(Item::class)->create();
         factory(Bid::class)->create([
             'user_id' => $user1->id,
@@ -152,7 +153,7 @@ class BidControllerTest extends TestCase
             'amount' => '124.23'
         ]);
         factory(Bid::class)->create([
-            'user_id' => $user2->id,
+            'user_id' => $user3->id,
             'item_id' => $item->id,
             'is_auto_bid' => 1,
             'amount' => '3235.12'
