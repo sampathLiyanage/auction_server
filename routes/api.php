@@ -22,4 +22,6 @@ Route::middleware([\App\Http\Middleware\ValidateAuthToken::class])->group(functi
     Route::post('bids', 'BidController@store');
     Route::get('configurations/{userId}', 'ConfigurationController@show');
     Route::patch('configurations/{userId}', 'ConfigurationController@update');
+    Route::get('autoBidStatus', 'AutoBidStatusController@show');
+    Route::patch('autoBidStatus', 'AutoBidStatusController@update');
 });

@@ -17,7 +17,7 @@ class ConfigurationController extends Controller
         if ($userId != Session::get('loggedInUserId')) {
             throw new UnauthorizedException();
         }
-        return Configuration::where('user_id', '=', $userId)->firstOrCreate(['user_id'=>$userId], ['max_bid_amount'=>null]);
+        return Configuration::firstOrCreate(['user_id'=>$userId], ['max_bid_amount'=>null]);
     }
 
     public function update(Request $request, $userId) {

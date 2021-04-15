@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AutoBidStatus;
 use App\Exceptions\BadRequestException;
 use App\Exceptions\UnauthorizedException;
 use App\Item;
@@ -40,6 +41,7 @@ class BidController extends Controller
         } else if ($params['user_id'] != Session::get('loggedInUserId')) {
             throw new UnauthorizedException();
         }
+        $this->validateAutoBiddingNotEnabled($params['item_id'], $params['item_id']);
         $this->validateIfBiddingOnGoing($params['item_id']);
         if (!is_null($params['amount'])) {
             $this->validateBiddingAmount($params['item_id'], $params['amount']);
@@ -68,6 +70,13 @@ class BidController extends Controller
             if ($biddingAmount <= $latestBid->amount) {
                 throw new BadRequestException('Bid amount should be larger than previous bids');
             }
+        }
+    }
+
+    protected function validateAutoBiddingNotEnabled($uerId, $itemId) {
+        $autoBidStatus = AutoBidStatus::firstOrCreate(['user_id'=>$uerId, 'item_id'=>$itemId], []);
+        if ($autoBidStatus->auto_bid_enabled) {
+            throw new BadRequestException('Manual bidding is not allowed when auto bidding is enabled');
         }
     }
 }
