@@ -33,7 +33,7 @@ class BidController extends Controller
     public function store(Request $request) {
         $params = $request->only('amount', 'user_id', 'item_id');
         $validator = Validator::make($params,[
-            'amount' => 'nullable|integer|min:0',
+            'amount' => 'required|integer|min:0',
             'user_id' => 'required|integer|min:1',
             'item_id' => 'required|integer|min:1'
         ]);
@@ -44,9 +44,7 @@ class BidController extends Controller
         }
         $this->validateAutoBiddingNotEnabled($params['user_id'], $params['item_id']);
         $this->validateIfBiddingOnGoing($params['item_id']);
-        if (!is_null($params['amount'])) {
-            $this->validateBiddingAmount($params['item_id'], $params['amount']);
-        }
+        $this->validateBiddingAmountAndLatestBid($params['item_id'], $params['user_id'], $params['amount']);
         $bid = Bid::create($params);
         (new AutoBidBot(new AutoBidDefaultStrategy()))->autoBid($params['item_id']);
         return ['data'=>response()->json($bid, 201)];
@@ -61,7 +59,7 @@ class BidController extends Controller
         }
     }
 
-    protected function validateBiddingAmount($itemId, $biddingAmount) {
+    protected function validateBiddingAmountAndLatestBid($itemId, $userId, $biddingAmount) {
         $bidCount = Bid::where('item_id', '=', $itemId)
             ->orderBy('amount', 'DESC')
             ->count();
@@ -71,6 +69,8 @@ class BidController extends Controller
                 ->first();
             if ($biddingAmount <= $latestBid->amount) {
                 throw new BadRequestException('Bid amount should be larger than previous bids');
+            } else if ($userId == $latestBid->user_id) {
+                throw new BadRequestException('Highest bid is already from the same user');
             }
         }
     }
