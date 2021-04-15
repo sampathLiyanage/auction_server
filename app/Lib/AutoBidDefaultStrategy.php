@@ -45,7 +45,7 @@ class AutoBidDefaultStrategy implements AutoBidStrategy
         $lastBid = $this->getLastBid($itemId);
         foreach ($usersWithMaxBidConfigured as $userWithMaxBidConfigured) {
             $currentBidSum = $this->getCurrentAutoBidSum($userWithMaxBidConfigured->user_id);
-            if ($lastBid->user_id == $userWithMaxBidConfigured->user_id) {
+            if ($lastBid && $lastBid->user_id == $userWithMaxBidConfigured->user_id) {
                 $currentBidSum -= $lastBid->amount;
             }
             $remainingBidAmount = $userWithMaxBidConfigured->max_bid_amount - $currentBidSum;
@@ -71,7 +71,7 @@ class AutoBidDefaultStrategy implements AutoBidStrategy
 
     protected function createNewBid($params) {
         $lastBid = $this->getLastBid($params['item_id']);
-        if ($lastBid->user_id != $params['user_id']) {
+        if (!$lastBid || $lastBid->user_id != $params['user_id']) {
             Bid::create($params);
         }
     }

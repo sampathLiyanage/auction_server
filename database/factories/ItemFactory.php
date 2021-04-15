@@ -21,6 +21,6 @@ $factory->define(Item::class, function (Faker $faker) {
         'name' => $faker->sentence(),
         'description' => $faker->text(),
         'price' => $faker->randomFloat(2, 1, 100000),
-        'auction_end_time' => $faker->dateTimeBetween('now', '+ 1 year')->format('Y-m-d h:m:s')
+        'auction_end_time' => $faker->dateTimeBetween('now', '+ 1 week')->format('Y-m-d h:m:s')
     ];
 });
