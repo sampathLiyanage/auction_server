@@ -53,6 +53,10 @@ class AutoBidDefaultStrategy implements AutoBidStrategy
                 $remainingAutoBidSums[$userWithMaxBidConfigured->user_id] = $remainingBidAmount;
             }
         }
+        $this->placeAutoBids($itemId, $remainingAutoBidSums, $currentMaxBidAmount);
+    }
+
+    protected function placeAutoBids($itemId, $remainingAutoBidSums, $currentMaxBidAmount) {
         if (count($remainingAutoBidSums) === 1) {
             $this->createNewBid(['amount'=> $currentMaxBidAmount+1, 'user_id'=>array_key_first($remainingAutoBidSums), 'item_id'=>$itemId, 'is_auto_bid'=>1]);
         } else if (count($remainingAutoBidSums) > 1) {
