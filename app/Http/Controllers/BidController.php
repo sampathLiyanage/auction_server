@@ -41,7 +41,7 @@ class BidController extends Controller
         } else if ($params['user_id'] != Session::get('loggedInUserId')) {
             throw new UnauthorizedException();
         }
-        $this->validateAutoBiddingNotEnabled($params['item_id'], $params['item_id']);
+        $this->validateAutoBiddingNotEnabled($params['user_id'], $params['item_id']);
         $this->validateIfBiddingOnGoing($params['item_id']);
         if (!is_null($params['amount'])) {
             $this->validateBiddingAmount($params['item_id'], $params['amount']);
