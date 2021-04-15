@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\BadRequestException;
-use Illuminate\Http\Request;
 use App\Item;
 use Illuminate\Support\Facades\Validator;
 
