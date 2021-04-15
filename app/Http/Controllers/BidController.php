@@ -7,6 +7,7 @@ use App\Exceptions\BadRequestException;
 use App\Exceptions\UnauthorizedException;
 use App\Item;
 use App\Lib\AutoBidBot;
+use App\Lib\AutoBidDefaultStrategy;
 use Illuminate\Http\Request;
 use App\Bid;
 use Illuminate\Support\Facades\Session;
@@ -47,7 +48,7 @@ class BidController extends Controller
             $this->validateBiddingAmount($params['item_id'], $params['amount']);
         }
         $bid = Bid::create($params);
-        AutoBidBot::getInstance()->handleAutoBid($params['item_id']);
+        (new AutoBidBot(new AutoBidDefaultStrategy()))->autoBid($params['item_id']);
         return response()->json($bid, 201);
     }
 
