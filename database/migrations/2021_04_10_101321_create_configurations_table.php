@@ -16,7 +16,7 @@ class CreateConfigurationsTable extends Migration
         Schema::create('configurations', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id')->unsigned()->unique();
-            $table->text('configuration');
+            $table->float('max_bid_amount')->nullable();
             $table->timestamps();
         });
 

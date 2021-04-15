@@ -17,25 +17,22 @@ class ConfigurationController extends Controller
         if ($userId != Session::get('loggedInUserId')) {
             throw new UnauthorizedException();
         }
-        return Configuration::where('user_id', '=', $userId)->first();
+        return Configuration::where('user_id', '=', $userId)->firstOrCreate(['user_id'=>$userId], ['max_bid_amount'=>null]);
     }
 
     public function update(Request $request, $userId) {
         $this->validateUserId($userId);
-        $configValue = $request->only('max_bid_amount');
-        $validator = Validator::make($configValue,[
+        $params = $request->only('max_bid_amount');
+        $validator = Validator::make($params,[
             'max_bid_amount' => 'nullable|numeric|min:0'
         ]);
         if ($validator->fails()) {
             throw new BadRequestException($validator->errors()->toJson());
         }
-
-        if ($configuration = $this->show($userId)) {
-            $configuration->configuration = json_encode($configValue);
-            $configuration->save();
-        } else {
-            $configuration = Configuration::create(['user_id'=>$userId, 'configuration'=>json_encode($configValue)]);
+        if ($userId != Session::get('loggedInUserId')) {
+            throw new UnauthorizedException();
         }
+        $configuration = Configuration::updateOrCreate(['user_id'=>$userId], ['max_bid_amount'=>$params['max_bid_amount']]);
         return response()->json($configuration, 200);
     }
 
