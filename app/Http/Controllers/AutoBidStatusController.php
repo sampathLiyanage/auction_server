@@ -45,6 +45,6 @@ class AutoBidStatusController extends Controller
         if ($params['auto_bid_enabled']) {
             (new AutoBidBot(new AutoBidDefaultStrategy()))->autoBid($params['item_id']);
         }
-        return response()->json($autoBidStatus, 200);
+        return ['data'=>response()->json($autoBidStatus, 200)];
     }
 }

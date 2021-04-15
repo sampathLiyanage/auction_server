@@ -49,7 +49,7 @@ class BidController extends Controller
         }
         $bid = Bid::create($params);
         (new AutoBidBot(new AutoBidDefaultStrategy()))->autoBid($params['item_id']);
-        return response()->json($bid, 201);
+        return ['data'=>response()->json($bid, 201)];
     }
 
     protected function validateIfBiddingOnGoing($itemId) {
