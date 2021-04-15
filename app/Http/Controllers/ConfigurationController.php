@@ -6,6 +6,7 @@ use App\Exceptions\BadRequestException;
 use App\Exceptions\UnauthorizedException;
 use App\Http\Controllers\Controller;
 use App\Configuration;
+use App\Lib\AutoBidBot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -33,6 +34,9 @@ class ConfigurationController extends Controller
             throw new UnauthorizedException();
         }
         $configuration = Configuration::updateOrCreate(['user_id'=>$userId], ['max_bid_amount'=>$params['max_bid_amount']]);
+        if ($params['max_bid_amount'] > 0) {
+            AutoBidBot::getInstance()->handleAutoBid(null, null);
+        }
         return response()->json($configuration, 200);
     }
 

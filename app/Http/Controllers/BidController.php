@@ -6,6 +6,7 @@ use App\AutoBidStatus;
 use App\Exceptions\BadRequestException;
 use App\Exceptions\UnauthorizedException;
 use App\Item;
+use App\Lib\AutoBidBot;
 use Illuminate\Http\Request;
 use App\Bid;
 use Illuminate\Support\Facades\Session;
@@ -23,18 +24,17 @@ class BidController extends Controller
         }
         $data = Bid::with('user:id,name')
             ->where('item_id', '=', $itemId)
-            ->orderBy('created_at', 'DESC')
+            ->orderBy('id', 'DESC')
             ->get();
         return ['data'=>$data];
     }
 
     public function store(Request $request) {
-        $params = $request->only('amount', 'user_id', 'item_id', 'is_auto_bid');
+        $params = $request->only('amount', 'user_id', 'item_id');
         $validator = Validator::make($params,[
             'amount' => 'nullable|integer|min:0',
             'user_id' => 'required|integer|min:1',
-            'item_id' => 'required|integer|min:1',
-            'is_auto_bid' => 'boolean',
+            'item_id' => 'required|integer|min:1'
         ]);
         if ($validator->fails()) {
             throw new BadRequestException($validator->errors()->toJson());
@@ -47,6 +47,7 @@ class BidController extends Controller
             $this->validateBiddingAmount($params['item_id'], $params['amount']);
         }
         $bid = Bid::create($params);
+        AutoBidBot::getInstance()->handleAutoBid($params['item_id']);
         return response()->json($bid, 201);
     }
 
@@ -65,7 +66,7 @@ class BidController extends Controller
             ->count();
         if ($bidCount > 0) {
             $latestBid = Bid::where('item_id', '=', $itemId)
-                ->orderBy('amount', 'DESC')
+                ->orderBy('id', 'DESC')
                 ->first();
             if ($biddingAmount <= $latestBid->amount) {
                 throw new BadRequestException('Bid amount should be larger than previous bids');

@@ -22,5 +22,17 @@ class UsersTableSeeder extends Seeder
             'name' => 'user2',
             'password' => md5('user2')
         ]);
+        User::create([
+            'name' => 'user3',
+            'password' => md5('user3')
+        ]);
+        User::create([
+            'name' => 'user4',
+            'password' => md5('user4')
+        ]);
+        User::create([
+            'name' => 'user5',
+            'password' => md5('user5')
+        ]);
     }
 }

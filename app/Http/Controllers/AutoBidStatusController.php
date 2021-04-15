@@ -6,6 +6,7 @@ use App\AutoBidStatus;
 use App\Bid;
 use App\Exceptions\BadRequestException;
 use App\Exceptions\UnauthorizedException;
+use App\Lib\AutoBidBot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -41,6 +42,9 @@ class AutoBidStatusController extends Controller
             throw new UnauthorizedException();
         }
         $autoBidStatus = AutoBidStatus::updateOrCreate(['user_id'=>$params['user_id'], 'item_id'=>$params['item_id']], ['auto_bid_enabled'=>$params['auto_bid_enabled']]);
+        if ($params['auto_bid_enabled']) {
+            AutoBidBot::getInstance()->handleAutoBid($params['item_id']);
+        }
         return response()->json($autoBidStatus, 200);
     }
 }

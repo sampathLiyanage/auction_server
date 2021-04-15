@@ -19,7 +19,7 @@ class ItemsTableSeeder extends Seeder
                 'name' => $faker->sentence,
                 'description' => $faker->paragraph,
                 'price' => $faker->numberBetween(1,10000),
-                'auction_end_time' => $faker->dateTimeBetween('now', '+ 1 year')->format('Y-m-d h:m:s')
+                'auction_end_time' => $faker->dateTimeBetween('now', '+ 2 week')->format('Y-m-d h:m:s')
             ]);
         }
     }
