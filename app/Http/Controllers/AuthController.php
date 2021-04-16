@@ -11,6 +11,34 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+    /**
+     * @api {post} api/login Login to System
+     * @apiName Login
+     * @apiGroup Auction
+     *
+     * @apiParam {String} username user name of the user
+     * @apiParam {String} password password of the user
+     *
+     * @apiSuccess {Json} User data
+     * @apiSuccessExample Success-Response:
+     *  HTTP/1.1 200 OK
+     * {
+     *    "data": {
+     *      "id":"1",
+     *      "name":"user1",
+     *      "api_token":"LQ7fI13n3GIazTslIH0Z4R2tT78QmJbX8Nd1J8355ZMYoSHZxGvIkiSY4ds0",
+     *      "created_at":"2021-04-15T23:09:59.000000Z",
+     *      "updated_at":"2021-04-15T23:09:59.000000Z",
+     *    }
+     * }
+     *
+     * @apiError Unauthorized Login Credentials Mismatch
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 403 Unauthorized
+     *     {
+     *       "message": "Login Credentials Mismatch"
+     *     }
+     */
     public function login(Request $request) {
         $credentials = $request->only('username', 'password');
         $validator = Validator::make($credentials,[

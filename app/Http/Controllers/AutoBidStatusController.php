@@ -13,6 +13,40 @@ use Illuminate\Support\Facades\Validator;
 
 class AutoBidStatusController extends Controller
 {
+    /**
+     * @api {get} api/autoBidStatus?itemId=:itemId&userId=:userId Get auto bid status
+     * @apiName GetAutoBidStatus
+     * @apiGroup Auction
+     *
+     * @apiParam {Number} itemId Id of an action item
+     * @apiParam {Number} userId Id of a user
+     *
+     * @apiSuccess {Json} matching auction item as data
+     * @apiSuccessExample Success-Response:
+     *  HTTP/1.1 200 OK
+     * {
+     *  "data": {
+     *    "id": 13,
+     *    "user_id": 1,
+     *    "item_id": 22,
+     *    "auto_bid_enabled": 0,
+     *    "created_at": "2021-04-15T23:51:20.000000Z",
+     *    "updated_at": "2021-04-15T23:51:20.000000Z"
+     *  }
+     * }
+     *
+     * @apiError ValidationError validation error
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 400 Bad Request
+     *     {
+     *       "error": "id field should be an integer"
+     *     }
+     *
+     * @apiError Unauthorized Unauthorized error
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 403 Unauthorized
+     *     {}
+     */
     public function show() {
         $itemId = request('item_id');
         $userId = request('user_id');
@@ -31,6 +65,41 @@ class AutoBidStatusController extends Controller
         ], 200);
     }
 
+    /**
+     * @api {patch} api/autoBidStatus?itemId=:itemId&userId=:userId Update auto bid status
+     * @apiName UpdateAutoBidStatus
+     * @apiGroup Auction
+     *
+     * @apiParam {Number} itemId Id of an action item
+     * @apiParam {Number} userId Id of a user
+     * @apiParam {Boolean} auto_bid_enabled Auto bid enabled or not
+     *
+     * @apiSuccess {Json} matching auction item as data
+     * @apiSuccessExample Success-Response:
+     *  HTTP/1.1 200 OK
+     * {
+     *  "data": {
+     *    "id": 13,
+     *    "user_id": 1,
+     *    "item_id": 22,
+     *    "auto_bid_enabled": true,
+     *    "created_at": "2021-04-15T23:51:20.000000Z",
+     *    "updated_at": "2021-04-16T00:16:54.000000Z"
+     *  }
+     * }
+     *
+     * @apiError ValidationError validation error
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 400 Bad Request
+     *     {
+     *       "error": "user_id field should be an integer"
+     *     }
+     *
+     * @apiError Unauthorized Unauthorized error
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 403 Unauthorized
+     *     {}
+     */
     public function update(Request $request) {
         $params = $request->only('user_id', 'item_id', 'auto_bid_enabled');
         $validator = Validator::make($params,[

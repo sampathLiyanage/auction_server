@@ -15,6 +15,67 @@ use Illuminate\Support\Facades\Validator;
 
 class BidController extends Controller
 {
+    /**
+     * @api {get} api/bids?itemId=:itemId Get bids of an auction item
+     * @apiName GetBids
+     * @apiGroup Auction
+     *
+     * @apiParam {Number} itemId id of an auction item
+     *
+     * @apiSuccess {Json} matching bids
+     * @apiSuccessExample Success-Response:
+     *  HTTP/1.1 200 OK
+     * {
+     *  "data": [
+     *    {
+     *      "id": 55,
+     *      "amount": 1001,
+     *      "user_id": 1,
+     *      "item_id": 2,
+     *      "is_auto_bid": 1,
+     *      "created_at": "2021-04-15T20:51:53.000000Z",
+     *      "updated_at": "2021-04-15T20:51:53.000000Z",
+     *      "user": {
+     *        "id": 1,
+     *        "name": "user1"
+     *      }
+     *    },
+     *    {
+     *      "id": 54,
+     *      "amount": 530,
+     *      "user_id": 2,
+     *      "item_id": 2,
+     *      "is_auto_bid": 1,
+     *      "created_at": "2021-04-15T20:51:53.000000Z",
+     *      "updated_at": "2021-04-15T20:51:53.000000Z",
+     *      "user": {
+     *        "id": 2,
+     *        "name": "user2"
+     *      }
+     *    },
+     *    {
+     *      "id": 51,
+     *      "amount": 529,
+     *      "user_id": 1,
+     *      "item_id": 2,
+     *      "is_auto_bid": 1,
+     *      "created_at": "2021-04-15T20:09:29.000000Z",
+     *      "updated_at": "2021-04-15T20:09:29.000000Z",
+     *      "user": {
+     *        "id": 1,
+     *        "name": "user1"
+     *      }
+     *    }
+     *  ]
+     * }
+     *
+     * @apiError ValidationError validation error
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 400 Bad Request
+     *     {
+     *       "error": "item_id is required"
+     *     }
+     */
     public function search() {
         $itemId = request('itemId');
         $validator = Validator::make(['itemId'=>$itemId],[
@@ -32,6 +93,41 @@ class BidController extends Controller
         ], 200);
     }
 
+    /**
+     * @api {post} api/bids Place bids on auction items
+     * @apiName CreateBids
+     * @apiGroup Auction
+     *
+     * @apiParam {String} amount bid amount
+     * @apiParam {String} user_id id of the user submitting the bid
+     * @apiParam {String} item_id id of the auction item which the bid is on
+     *
+     * @apiSuccess {Json} placed bid data
+     * @apiSuccessExample Success-Response:
+     *  HTTP/1.1 201 Created
+     * {
+     *  "data": {
+     *    "amount": 234,
+     *    "user_id": "1",
+     *    "item_id": 22,
+     *    "updated_at": "2021-04-15T23:51:23.000000Z",
+     *    "created_at": "2021-04-15T23:51:23.000000Z",
+     *    "id": 59
+     *  }
+     * }
+     *
+     * @apiError ValidationError validation error
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 400 Bad Request
+     *     {
+     *       "message": "Bid amount should be larger than previous bids"
+     *     }
+     *
+     * @apiError Unauthorized Unauthorized error
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 403 Unauthorized
+     *     {}
+     */
     public function store(Request $request) {
         $params = $request->only('amount', 'user_id', 'item_id');
         $validator = Validator::make($params,[

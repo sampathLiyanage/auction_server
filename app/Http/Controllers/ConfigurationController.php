@@ -13,6 +13,38 @@ use Illuminate\Support\Facades\Validator;
 
 class ConfigurationController extends Controller
 {
+    /**
+     * @api {get} api/configurations/:userId Get configurations of a user
+     * @apiName GetConfiguration
+     * @apiGroup Auction
+     *
+     * @apiParam {Number} userId Id of the user
+     *
+     * @apiSuccess {Json} matching configuration as data
+     * @apiSuccessExample Success-Response:
+     *  HTTP/1.1 200 OK
+     * {
+     *  "data": {
+     *    "id": 1,
+     *    "user_id": 1,
+     *    "max_bid_amount": 501,
+     *    "created_at": "2021-04-15T17:44:30.000000Z",
+     *    "updated_at": "2021-04-15T22:55:03.000000Z"
+     *  }
+     * }
+     *
+     * @apiError ValidationError validation error
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 400 Bad Request
+     *     {
+     *       "error": "id field should be an integer"
+     *     }
+     *
+     * @apiError Unauthorized Unauthorized error
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 403 Unauthorized
+     *     {}
+     */
     public function show($userId) {
         $this->validateUserId($userId);
         if ($userId != Session::get('loggedInUserId')) {
@@ -22,6 +54,39 @@ class ConfigurationController extends Controller
         return response()->json(['data'=>$data], 200);
     }
 
+    /**
+     * @api {patch} api/configuration/:userId Update user configuration
+     * @apiName UpdateConfiguration
+     * @apiGroup Auction
+     *
+     * @apiParam {Number} userId Id of the user
+     * @apiParam {Boolean} max_bid_amount Maximum auto bid amount
+     *
+     * @apiSuccess {Json} matching configuration as data
+     * @apiSuccessExample Success-Response:
+     *  HTTP/1.1 200 OK
+     * {
+     *  "data": {
+     *    "id": 1,
+     *    "user_id": 1,
+     *    "max_bid_amount": 501,
+     *    "created_at": "2021-04-15T17:44:30.000000Z",
+     *    "updated_at": "2021-04-15T22:55:03.000000Z"
+     *  }
+     * }
+     *
+     * @apiError ValidationError validation error
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 400 Bad Request
+     *     {
+     *       "error": "max_bid_amount field should be a number"
+     *     }
+     *
+     * @apiError Unauthorized Unauthorized error
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 403 Unauthorized
+     *     {}
+     */
     public function update(Request $request, $userId) {
         $this->validateUserId($userId);
         $params = $request->only('max_bid_amount');
